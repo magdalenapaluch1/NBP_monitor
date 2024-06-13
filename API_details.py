@@ -1,8 +1,13 @@
-'''Connection with API to get response about currencies'''
+'''Connection with API to get response about currencies and gold'''
 
 from requests import get
 
-def get_currencies():
+def get_currencies() -> list:
+    """API connection to show the details of curriencies for today
+
+    Returns:
+        list: information about rates of currencies
+    """
 
     api_url = 'http://api.nbp.pl/api/exchangerates/tables/A/today/'
     response = get(api_url)
@@ -10,8 +15,12 @@ def get_currencies():
     return currency_data
 
 
-def get_gold_rate():
-    '''1g złota'''
+def get_gold_rate() -> list:
+    """API connection to show the details of gold rates for today
+        rates describe only 1g of gold
+    Returns:
+        list: information about rates of gold
+    """
     api_url = 'http://api.nbp.pl/api/cenyzlota/today'
     response = get(api_url)
     gold_data = response.json()
