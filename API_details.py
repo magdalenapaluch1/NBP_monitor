@@ -11,6 +11,10 @@ def get_currencies() -> list:
 
     api_url = 'http://api.nbp.pl/api/exchangerates/tables/A/today/'
     response = get(api_url)
+    if response.status_code == 404:
+        api_url = 'http://api.nbp.pl/api/exchangerates/tables/A/'
+        response = get(api_url)
+        #TODO handle other errors
     currency_data = response.json()
     return currency_data
 
@@ -23,5 +27,9 @@ def get_gold_rate() -> list:
     """
     api_url = 'http://api.nbp.pl/api/cenyzlota/today'
     response = get(api_url)
+    if response.status_code == 404:
+        api_url = 'http://api.nbp.pl/api/cenyzlota/'
+        response = get(api_url)
+        #TODO handle other errors
     gold_data = response.json()
     return gold_data

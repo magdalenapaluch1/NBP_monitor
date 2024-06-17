@@ -16,13 +16,16 @@ def main():
 
 
     basic_codes = ['EUR', 'USD', 'GBP', 'CHF']
-    currencies = get_today_exchange_rate(basic_codes)
-    gold = get_today_gold_rate()
+    currencies, currencies_date = get_today_exchange_rate(basic_codes)
+    gold, gold_date = get_today_gold_rate()
 
     result.config(state='normal')
 
+    result.insert(tk.INSERT, f'Kurs złota na dzień: {currencies_date}\n')
+
     result.insert(tk.INSERT, f'Wartość złota 1g - {gold:0.2f} zł.\n')
 
+    result.insert(tk.INSERT, f'Kursy walut na dzień: {gold_date}\n')
     for currency in currencies:
         result.insert(tk.INSERT, f'Kurs waluty: {currency['currency'].upper()}, wynosi 1{currency['code']} - {currency['mid']:.2f}zł.\n')
     result.config(state='disabled')
