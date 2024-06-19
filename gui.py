@@ -4,9 +4,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import graph
 import tkinter as tk
 from tkinter import ttk
+from datetime import datetime
 
 PADING_VALUE = 10 #offset from the axis
 DROP_DOWN_MENU_VALUE = ["USD", "EUR", "CHF", "GBP", "ZŁOTO"]
+TODAY = datetime.today()
 
 class GUI:
 
@@ -43,7 +45,7 @@ class GUI:
         accept_button = tk.Button(
             frame_date_input, 
             text = "OK", 
-            command = lambda: GUI.button_pushed(fig, canvas, combo_currencies.get(), start_date.get(), end_date.get())
+            command = lambda: self.button_pushed(fig, canvas, combo_currencies.get(), start_date.get(), end_date.get())
             )
 
         #Creating grid table
@@ -60,7 +62,7 @@ class GUI:
         #Entry dates period to plot graph
         start_date.insert(0,'rrrr-mm-dd')
         start_date_label.grid(column = 0, row = 1, padx = PADING_VALUE)
-        end_date.insert(0,'rrrr-mm-dd')
+        end_date.insert(0,TODAY.strftime('%Y-%m-%d'))
         end_date.grid(column = 0, row = 4, padx = PADING_VALUE)
 
         #User choice of currency
@@ -98,7 +100,7 @@ class GUI:
         #Start Tkinter loop
         app_window.mainloop()
 
-    def button_pushed(figure, canvas, code, start_date, end_date):
+    def button_pushed(self, figure, canvas, code, start_date, end_date):
         """_summary_
 
         Args:
