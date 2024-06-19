@@ -3,12 +3,26 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import graph
 import tkinter as tk
+from tkinter import ttk
 
 PADING_VALUE = 10
+DROP_DOWN_MENU_VALUE = ["USD", "EUR", "CHF", "GBP", "ZŁOTO"]
+
+def button_pushed(figure, canvas, code, start_date, end_date):
+
+    if code == 'ZŁOTO':
+        key_date, value_rate = graph.create_graph_gold(start_date, end_date)
+        figure.clear()
+        figure.add_subplot(111).plot(key_date, value_rate)
+        canvas.draw()
+    else:
+        key_date, value_rate = graph.create_graph_currencies(code, start_date, end_date)
+        figure.clear()
+        figure.add_subplot(111).plot(key_date, value_rate)
+        canvas.draw()
+
 
 def main():
-
-    key_date, value_rate = graph.create_graph_currencies('USD', '2024-06-03', '2024-06-11')
 
     app_window = tk.Tk()
     app_window.title('Kursy walut')
@@ -34,10 +48,26 @@ def main():
 
     #okna do wprowadzenia daty Entry
     start_date = tk.Entry(frame_date_input)
-    start_date.grid(column = 0, row = 1, padx = PADING_VALUE)
+    start_date.insert(0,'rrrr-mm-dd')
+    start_date.grid(column = 0, row = 2, padx = PADING_VALUE)
+    start_date_label = tk.Label(frame_date_input, text='Data startu: ', )
+    start_date_label.grid(column = 0, row = 1, padx = PADING_VALUE)
+    end_date = tk.Entry(frame_date_input)
+    end_date.insert(0,'rrrr-mm-dd')
+    end_date.grid(column = 0, row = 4, padx = PADING_VALUE)
+    end_date_label = tk.Label(frame_date_input, text='Data zakończenia: ')
+    end_date_label.grid(column = 0, row = 3, padx = PADING_VALUE)
+    #wybór waluty z menu rozwijanego
+    combo_currencies_label = tk.Label(frame_date_input, text='Wybierz walutę: ')
+    combo_currencies_label.grid(column = 0, row = 5, padx = PADING_VALUE)
+    combo_currencies = ttk.Combobox(frame_date_input, state="readonly", values=DROP_DOWN_MENU_VALUE)
+    combo_currencies.current(0)
+    combo_currencies.grid(column = 0, row = 6, padx = PADING_VALUE)
+    fig = Figure(figsize=(5, 4), dpi=100)
+    canvas = FigureCanvasTkAgg(fig, master=frame_graph)  # A tk.DrawingArea.
     #Button zatwierdzajacy
-    accept_button = tk.Button(frame_date_input, text = "OK")
-    accept_button.grid(column = 0, row = 2)
+    accept_button = tk.Button(frame_date_input, text = "OK", command= lambda: button_pushed(fig, canvas, combo_currencies.get(), start_date.get(), end_date.get()))
+    accept_button.grid(column = 0, row = 7, pady = PADING_VALUE)
 
 
     basic_codes = ['EUR', 'USD', 'GBP', 'CHF']
@@ -55,14 +85,8 @@ def main():
         result.insert(tk.INSERT, f'Kurs waluty: {currency['currency'].upper()}, wynosi 1{currency['code']} - {currency['mid']:.2f}zł.\n')
     result.config(state='disabled')
 
-
-
-    fig = Figure(figsize=(5, 4), dpi=100)
-    fig.add_subplot(111).plot(key_date, value_rate)
-
-    canvas = FigureCanvasTkAgg(fig, master=frame_graph)  # A tk.DrawingArea.
-    canvas.draw()
     canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1, padx = PADING_VALUE, pady = PADING_VALUE)
+
 
     app_window.mainloop()
 
