@@ -18,3 +18,4 @@ def create_graph_gold(start_date, end_date):
     graph_rates = list(result.values())
 
     return graph_date, graph_rates
+    

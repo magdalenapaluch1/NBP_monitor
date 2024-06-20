@@ -1,4 +1,5 @@
 from rates_for_today import get_today_exchange_rate, get_today_gold_rate
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import graph
@@ -38,8 +39,9 @@ class GUI:
 
         #Create atributes to plot graph
         graph_label = tk.Label(frame_result, text='Wykres wartości w czasie')
-        fig = Figure(figsize = (5, 4), dpi = 100)
+        fig = Figure(figsize = (5, 7.5), dpi = 100)
         canvas = FigureCanvasTkAgg(fig, master = frame_graph)
+
 
         #Get information from Input Form Frame
         accept_button = tk.Button(
@@ -61,6 +63,10 @@ class GUI:
 
         #Entry dates period to plot graph
         start_date.insert(0,'rrrr-mm-dd')
+        start_date.bind('<FocusIn>', self.on_entry_click)
+        start_date.bind('<FocusOut>', self.on_focusout)
+        start_date.bind('<KeyPress>', self.on_key_press)
+        start_date.bind('<KeyRelease>', self.on_key_release)
         start_date_label.grid(column = 0, row = 1, padx = PADING_VALUE)
         end_date.insert(0,TODAY.strftime('%Y-%m-%d'))
         end_date.grid(column = 0, row = 4, padx = PADING_VALUE)
@@ -114,10 +120,43 @@ class GUI:
         if code == 'ZŁOTO':
             key_date, value_rate = graph.create_graph_gold(start_date, end_date)
             figure.clear()
-            figure.add_subplot(111).plot(key_date, value_rate)
+            gold_plot = figure.add_subplot(111)
+            gold_plot.plot(key_date, value_rate)
+            gold_plot.tick_params(axis='x', rotation=45)
+            gold_plot.set_ylabel('Wartość')
             canvas.draw()
         else:
             key_date, value_rate = graph.create_graph_currencies(code, start_date, end_date)
             figure.clear()
-            figure.add_subplot(111).plot(key_date, value_rate)
+            currency_plot = figure.add_subplot(111)
+            currency_plot.plot(key_date, value_rate)
+            currency_plot.tick_params(axis='x', rotation=45)
+            currency_plot.set_ylabel('Wartość')
             canvas.draw()
+
+    def on_entry_click(self, event):
+        """Removes the default text on the first click"""
+        if event.widget.get() == 'rrrr-mm-dd':
+            event.widget.delete(0, tk.END)
+            event.widget.insert(0, '')
+
+    def on_focusout(self, event):
+        """Restores the default text if the field is empty"""
+        if event.widget.get() == '':
+            event.widget.delete(0, tk.END)
+            event.widget.insert(0, 'rrrr-mm-dd')
+
+    def on_key_press(self, event):
+        """Check that only numbers are entered and len of date are equal 10"""
+        if not event.char.isdigit():
+            return 'break'
+        pos = event.widget.index(tk.INSERT)
+        if pos == 10:
+            return 'break'
+
+    def on_key_release(self, event):
+        """Adding a dash in the appropriate places in the date 'yyyy-mm-dd'"""
+        pos = event.widget.index(tk.INSERT)
+        # Automatic hyphen traversal
+        if pos in [4, 7]:
+            event.widget.insert(pos, '-')

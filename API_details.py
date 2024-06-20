@@ -20,7 +20,10 @@ def get_currencies() -> list:
 
 def get_currencies_from_period(code: str, start_date:str, end_date:str):
     """API connection to show the details (rates) of curriencies from period
-        user can enter start and end date to see the rates 
+        user can enter start and end date to see the rates.
+        Archived data is available as follows:
+        for exchange rates from January 2, 2002,
+        however, a single query cannot cover a period longer than 93 days.
 
     Args:
         code (str): three-letter currency code (ISO 4217 standard)
@@ -57,7 +60,10 @@ def get_gold_rate() -> list:
 
 def get_gold_from_period(start_date:str, end_date:str):
     """API connection to show the details (rates) of gold from period
-        user can enter start and end date to see the rates 
+        user can enter start and end date to see the rates.
+        Archived data is available as follows:
+        for exchange rates from January 2, 2013,
+        however, a single query cannot cover a period longer than 93 days. 
 
     Args:
         start_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
