@@ -6,6 +6,7 @@ import graph
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime, timedelta
+from mplcursors import cursor
 
 PADING_VALUE = 10 #offset from the axis
 DROP_DOWN_MENU_VALUE = ["USD", "EUR", "CHF", "GBP", "ZŁOTO"]
@@ -21,7 +22,7 @@ class GUI:
         #Create Frames in Tkinter window
         frame_result = tk.Frame(app_window, highlightbackground = 'black', highlightthickness = 0)
         frame_graph = tk.Frame(app_window, highlightbackground = 'black', highlightthickness = 0)
-        frame_date_input = tk.Frame(app_window, highlightbackground = 'black', highlightthickness = 1)
+        frame_date_input = tk.Frame(app_window, highlightbackground = 'black', highlightthickness = 0)
 
         #Label and Title to frame with rates values(text field)
         result_label = tk.Label(frame_result, text='Rezultat')
@@ -37,8 +38,10 @@ class GUI:
                                       command = lambda: self.period_button_pushed(combo_currencies.get(), 1))
         buttons_choice_1M = tk.Button(frame_date_input, text="1M", 
                                       command = lambda: self.period_button_pushed(combo_currencies.get(), 30))
-        buttons_choice_3M = tk.Button(frame_date_input, text="3M")
-        buttons_choice_6M = tk.Button(frame_date_input, text="6M")
+        buttons_choice_3M = tk.Button(frame_date_input, text="3M", 
+                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 90))
+        buttons_choice_6M = tk.Button(frame_date_input, text="6M", 
+                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 180))
         #Creating Drop-Down menu with currencies and gold
         combo_currencies_label = tk.Label(frame_date_input, text = 'Wybierz walutę: ')
         combo_currencies = ttk.Combobox(frame_date_input, state = "readonly", values = DROP_DOWN_MENU_VALUE)
@@ -47,7 +50,6 @@ class GUI:
         graph_label = tk.Label(frame_result, text='Wykres wartości w czasie')
         self.fig = Figure(figsize = (5.0, 7.5), dpi = 100)
         self.canvas = FigureCanvasTkAgg(self.fig, master = frame_graph)
-
 
         #Get information from Input Form Frame
         accept_button = tk.Button(
@@ -132,6 +134,7 @@ class GUI:
             gold_plot.plot(key_date, value_rate, marker = '*')
             gold_plot.tick_params(axis='x', rotation=45)
             gold_plot.set_ylabel('Wartość')
+            cursor(gold_plot, hover=True)
             self.canvas.draw()
         else:
             key_date, value_rate = graph.create_graph_currencies(currencies_code, start_date, end_date)
@@ -140,6 +143,7 @@ class GUI:
             currency_plot.plot(key_date, value_rate, marker = '*')
             currency_plot.tick_params(axis='x', rotation=45)
             currency_plot.set_ylabel('Wartość')
+            cursor(currency_plot, hover=True)
             self.canvas.draw()
 
     def on_entry_click(self, event):
@@ -176,10 +180,9 @@ class GUI:
         Args:
             code (str): three-letter currency code (ISO 4217 standard) or GOLD
             start_date (str): date in YYYY-MM-DD format (ISO 8601 standard), choice from period buttons
-            end_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
+            end_date (str): date in YYYY-MM-DD format (ISO 8601 standard), today
         """
         start_date_period = datetime.strftime((datetime.today() - timedelta(days = day_period)), '%Y-%m-%d')
-        print(start_date_period)
         self.start_date_entry.delete(0, tk.END)
         self.start_date_entry.insert(0, start_date_period)
         self.OK_button_pushed(code, self.start_date_entry.get(), self.end_date_entry.get())
