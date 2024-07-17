@@ -1,8 +1,6 @@
-from rates_for_today import get_today_exchange_rate, get_today_gold_rate
-import matplotlib.pyplot as plt
+from NBP_API import *
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import graph
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime, timedelta
@@ -128,7 +126,7 @@ class GUI:
         """
 
         if currencies_code == 'ZŁOTO':
-            key_date, value_rate = graph.create_graph_gold(start_date, end_date)
+            key_date, value_rate = prepare_gold_data(start_date, end_date)
             self.fig.clear()
             gold_plot = self.fig.add_subplot(111)
             gold_plot.plot(key_date, value_rate, marker = '*')
@@ -137,7 +135,7 @@ class GUI:
             cursor(gold_plot, hover=True)
             self.canvas.draw()
         else:
-            key_date, value_rate = graph.create_graph_currencies(currencies_code, start_date, end_date)
+            key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
             self.fig.clear()
             currency_plot = self.fig.add_subplot(111)
             currency_plot.plot(key_date, value_rate, marker = '*')
@@ -160,6 +158,8 @@ class GUI:
 
     def on_key_press(self, event):
         """Check that only numbers are entered and len of date are equal 10"""
+        if event.keysym == "BackSpace":
+            return
         if not event.char.isdigit():
             return 'break'
         pos = event.widget.index(tk.INSERT)

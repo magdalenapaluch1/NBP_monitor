@@ -87,3 +87,50 @@ def get_gold_from_period(start_date:str, end_date:str):
         #TODO improve print
         
     return gold_rates_from_period
+
+'''Rates for today currencies and gold'''
+
+def get_today_exchange_rate(codes):
+    """gets current rates of currencies
+    """
+    currencies_list = []
+
+    json_response = get_currencies()
+    effective_date = json_response[0]['effectiveDate']
+
+    for name_currency in json_response[0]['rates']:
+        if name_currency['code'] in codes:
+            currencies_list.append({'currency': name_currency['currency'].upper(), 'code': name_currency['code'], 'mid': name_currency['mid']})
+
+    return currencies_list, effective_date
+
+def get_today_gold_rate():
+    """gets current rates of gold
+    """
+
+    json_response = get_gold_rate()
+    gold_date = json_response[0]['data']
+
+    gold_rate = json_response[0]['cena']
+
+    return gold_rate, gold_date
+
+'''Graph date preparation'''
+
+def prepare_currencies_data(code, start_date, end_date):
+
+    result = get_currencies_from_period(code, start_date, end_date)
+
+    graph_date = list(result.keys())
+    graph_rates = list(result.values())
+
+    return graph_date, graph_rates
+
+def prepare_gold_data(start_date, end_date):
+
+    result = get_gold_from_period(start_date, end_date)
+
+    graph_date = list(result.keys())
+    graph_rates = list(result.values())
+
+    return graph_date, graph_rates
