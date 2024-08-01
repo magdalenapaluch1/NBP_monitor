@@ -1,6 +1,8 @@
 from NBP_API import *
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.ticker import FormatStrFormatter
+from matplotlib import ticker
 import customtkinter as CT
 import tkinter as tk
 from datetime import datetime, timedelta
@@ -117,6 +119,15 @@ class GUI:
         #Start Tkinter loop
         app_window.mainloop()
 
+    # def round_list_values(self, values:list, dec_places:int) -> list:
+
+    #     rounded_values = []
+
+    #     for value in values:
+    #         rounded_values.append(round(value, dec_places))
+
+    #     return rounded_values
+
     def OK_button_pushed(self, currencies_code, start_date, end_date):
         """_summary_
 
@@ -126,22 +137,26 @@ class GUI:
             end_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
         """
 
+        self.fig.clear()
         if currencies_code == 'ZŁOTO':
             self.key_date, value_rate = prepare_gold_data(start_date, end_date)
-            self.fig.clear()
+            # rounded_values_data = self.round_list_values(value_rate, 2)
             gold_plot = self.fig.add_subplot(111)
-            gold_plot.plot(self.key_date, value_rate, marker = '*')
+            gold_plot.plot(self.key_date, value_rate, marker = 'o')
             gold_plot.tick_params(axis='x', rotation=45)
+            gold_plot.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            gold_plot.xaxis.set_major_locator(ticker.AutoLocator())
             gold_plot.set_ylabel('Kurs za 1g [PLN]')
             gold_plot.format_coord = self.format_coords
             cursor(gold_plot, hover=True)
             self.canvas.draw()
         else:
             self.key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
-            self.fig.clear()
             currency_plot = self.fig.add_subplot(111)
-            currency_plot.plot(self.key_date, value_rate, marker = '*')
+            currency_plot.plot(self.key_date, value_rate, marker = 'o')
             currency_plot.tick_params(axis='x', rotation=45)
+            currency_plot.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            currency_plot.xaxis.set_major_locator(ticker.AutoLocator())
             currency_plot.set_ylabel(f'Kurs za 1 {currencies_code} - PLN')
             currency_plot.format_coord = self.format_coords
             cursor(currency_plot, hover=True)
