@@ -67,7 +67,7 @@ class GUI:
         #Settings for result label and text field
         result.configure(state = 'normal')
         result.configure(state = 'disabled')
-        result_label.pack()
+        result_label.pack(padx = PADING_VALUE, pady = PADING_VALUE)
         result.pack(padx = PADING_VALUE, pady = (0, PADING_VALUE))
 
         #Entry dates period to plot graph
@@ -111,7 +111,7 @@ class GUI:
         result.configure(state='disabled')
 
         #Create graph space
-        graph_label.pack()
+        graph_label.pack(padx = PADING_VALUE, pady = PADING_VALUE)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1, padx = PADING_VALUE, pady = PADING_VALUE)
 
         #Start Tkinter loop
@@ -127,23 +127,29 @@ class GUI:
         """
 
         if currencies_code == 'ZŁOTO':
-            key_date, value_rate = prepare_gold_data(start_date, end_date)
+            self.key_date, value_rate = prepare_gold_data(start_date, end_date)
             self.fig.clear()
             gold_plot = self.fig.add_subplot(111)
-            gold_plot.plot(key_date, value_rate, marker = '*')
+            gold_plot.plot(self.key_date, value_rate, marker = '*')
             gold_plot.tick_params(axis='x', rotation=45)
-            gold_plot.set_ylabel('Wartość')
+            gold_plot.set_ylabel('Kurs za 1g [PLN]')
+            gold_plot.format_coord = self.format_coords
             cursor(gold_plot, hover=True)
             self.canvas.draw()
         else:
-            key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
+            self.key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
             self.fig.clear()
             currency_plot = self.fig.add_subplot(111)
-            currency_plot.plot(key_date, value_rate, marker = '*')
+            currency_plot.plot(self.key_date, value_rate, marker = '*')
             currency_plot.tick_params(axis='x', rotation=45)
-            currency_plot.set_ylabel('Wartość')
+            currency_plot.set_ylabel(f'Kurs za 1 {currencies_code} - PLN')
+            currency_plot.format_coord = self.format_coords
             cursor(currency_plot, hover=True)
             self.canvas.draw()
+
+    def format_coords(self, x, y):
+        idx = round(x)
+        return f"Data={self.key_date[idx]}, Kurs={y:.2f}PLN"
 
     def on_entry_click(self, event):
         """Removes the default text on the first click"""
