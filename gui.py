@@ -17,7 +17,6 @@ class GUI:
     def __init__(self) -> None:
         #Open Tkinter window
         app_window = CT.CTk()
-        app_window._set_appearance_mode("system")
         app_window.title('Kursy walut')
 
         #Create Frames in Tkinter window
@@ -65,6 +64,12 @@ class GUI:
         frame_graph.grid(column = 1, row = 0, rowspan = 3, sticky = "NEWS")
         frame_date_input.grid(column = 0, row = 0, sticky = "NEWS")
         frame_exchange.grid(column = 0, row = 2, stick = "NEWS")
+        #first column is const, second column is resizable
+        app_window.rowconfigure(0, weight=1)
+        app_window.rowconfigure(1, weight=1)
+        app_window.rowconfigure(2, weight=1)
+        app_window.columnconfigure(0, weight=0)
+        app_window.columnconfigure(1, weight=1)
 
         #Settings for result label and text field
         result.configure(state = 'normal')
@@ -146,6 +151,7 @@ class GUI:
             gold_plot.tick_params(axis='x', rotation=45)
             gold_plot.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
             gold_plot.xaxis.set_major_locator(ticker.AutoLocator())
+            gold_plot.grid(visible=True, linewidth=1)
             gold_plot.set_ylabel('Kurs za 1g [PLN]')
             gold_plot.format_coord = self.format_coords
             cursor(gold_plot, hover=True)
@@ -157,6 +163,7 @@ class GUI:
             currency_plot.tick_params(axis='x', rotation=45)
             currency_plot.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
             currency_plot.xaxis.set_major_locator(ticker.AutoLocator())
+            currency_plot.grid(visible=True, linewidth=1)
             currency_plot.set_ylabel(f'Kurs za 1 {currencies_code} - PLN')
             currency_plot.format_coord = self.format_coords
             cursor(currency_plot, hover=True)
