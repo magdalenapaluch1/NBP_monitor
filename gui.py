@@ -25,6 +25,20 @@ class GUI:
         frame_date_input = CT.CTkFrame(master=app_window, border_width = 1)
         frame_exchange = CT.CTkFrame(master=app_window, border_width = 1)
 
+        #exchange frame
+        exchange_label = CT.CTkLabel(frame_exchange, text = "Przelicz walutę")
+        confirm_button = CT.CTkButton(frame_exchange, text="Przelicz", width=60)
+        currency_quantity_left = CT.CTkEntry(frame_exchange)
+        combo_currencies_left = CT.CTkComboBox(frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        currency_quantity_right = CT.CTkEntry(frame_exchange)
+        combo_currencies_right = CT.CTkComboBox(frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        exchange_label.grid(row =0, columnspan = 4, sticky = "NEWS")
+        confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
+        currency_quantity_left.grid(row = 1, column = 0, sticky = "NEWS")
+        combo_currencies_left.grid(row = 1, column = 1, sticky = "NEWS")
+        currency_quantity_right.grid(row = 1, column = 2, sticky = "NEWS")
+        combo_currencies_right.grid(row = 1, column = 3, sticky = "NEWS")
+
         #Label and Title to frame with rates values(text field)
         result_label = CT.CTkLabel(frame_result, text='Rezultat')
         result = CT.CTkTextbox(frame_result, height = 200, width = 370)
