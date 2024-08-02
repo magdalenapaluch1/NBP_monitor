@@ -155,7 +155,10 @@ class GUI:
             start_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
             end_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
         """
-
+        if datetime.strptime(start_date, "%Y-%m-%d") > datetime.strptime(end_date, "%Y-%m-%d"):
+            self.wrong_date_popup()
+            return
+        
         self.fig.clear()
         if currencies_code == 'ZŁOTO':
             self.key_date, value_rate = prepare_gold_data(start_date, end_date)
@@ -229,3 +232,22 @@ class GUI:
         self.start_date_entry.delete(0, tk.END)
         self.start_date_entry.insert(0, start_date_period)
         self.OK_button_pushed(code, self.start_date_entry.get(), self.end_date_entry.get())
+
+    def center_window_to_display(self, Screen: CT.CTk, width: int, height: int, scale_factor: float = 1.0):
+        """Centers the window to the main display/monitor"""
+        screen_width = Screen.winfo_screenwidth()
+        screen_height = Screen.winfo_screenheight()
+        x = int(((screen_width/2) - (width/2)) * scale_factor)
+        y = int(((screen_height/2) - (height/1.5)) * scale_factor)
+        return f"{width}x{height}+{x}+{y}"
+
+    def wrong_date_popup(self):
+        msg_box = CT.CTk()
+        msg_box.resizable(width=0, height=0)
+        msg_box.geometry(self.center_window_to_display(msg_box, 200, 100, msg_box._get_window_scaling()))
+        msg_box.title("Błąd")
+        info_label = CT.CTkLabel(msg_box, text='Błędna wartość daty.')
+        info_label.pack(padx = 10, pady = 10)
+        OK_button = CT.CTkButton(msg_box, text="OK", width=50)
+        OK_button.pack(padx = 10, pady = 10)
+        msg_box.mainloop()
