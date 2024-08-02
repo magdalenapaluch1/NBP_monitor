@@ -5,6 +5,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib import ticker
 import customtkinter as CT
 import tkinter as tk
+from tkinter import messagebox
 from datetime import datetime, timedelta
 from mplcursors import cursor
 
@@ -242,12 +243,14 @@ class GUI:
         return f"{width}x{height}+{x}+{y}"
 
     def wrong_date_popup(self):
-        msg_box = CT.CTk()
-        msg_box.resizable(width=0, height=0)
-        msg_box.geometry(self.center_window_to_display(msg_box, 200, 100, msg_box._get_window_scaling()))
-        msg_box.title("Błąd")
-        info_label = CT.CTkLabel(msg_box, text='Błędna wartość daty.')
-        info_label.pack(padx = 10, pady = 10)
-        OK_button = CT.CTkButton(msg_box, text="OK", width=50)
-        OK_button.pack(padx = 10, pady = 10)
-        msg_box.mainloop()
+        # msg_box = CT.CTk()
+        # msg_box.resizable(width=0, height=0)
+        # msg_box.geometry(self.center_window_to_display(msg_box, 200, 100, msg_box._get_window_scaling()))
+        # msg_box.title("Błąd")
+        # info_label = CT.CTkLabel(msg_box, text='Błędna wartość daty.')
+        # OK_button = CT.CTkButton(msg_box, text="OK", width=50)
+        # info_label.pack(padx = 10, pady = 10)
+        # OK_button.pack(padx = 10, pady = 10)
+        # msg_box.mainloop()
+
+        msg_box = messagebox.showwarning(title="Błąd", message="Błędna wartość daty.")
