@@ -5,6 +5,7 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib import ticker
 import customtkinter as CT
 import tkinter as tk
+from tkinter import messagebox
 from datetime import datetime, timedelta
 from mplcursors import cursor
 
@@ -138,15 +139,6 @@ class GUI:
         #Start Tkinter loop
         app_window.mainloop()
 
-    # def round_list_values(self, values:list, dec_places:int) -> list:
-
-    #     rounded_values = []
-
-    #     for value in values:
-    #         rounded_values.append(round(value, dec_places))
-
-    #     return rounded_values
-
     def OK_button_pushed(self, currencies_code, start_date, end_date):
         """_summary_
 
@@ -155,11 +147,13 @@ class GUI:
             start_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
             end_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
         """
-
+        if datetime.strptime(start_date, "%Y-%m-%d") > datetime.strptime(end_date, "%Y-%m-%d"):
+            self.wrong_date_popup()
+            return
+        
         self.fig.clear()
         if currencies_code == 'ZŁOTO':
             self.key_date, value_rate = prepare_gold_data(start_date, end_date)
-            # rounded_values_data = self.round_list_values(value_rate, 2)
             gold_plot = self.fig.add_subplot(111)
             gold_plot.plot(self.key_date, value_rate, marker = 'o')
             gold_plot.tick_params(axis='x', rotation=45)
@@ -229,3 +223,14 @@ class GUI:
         self.start_date_entry.delete(0, tk.END)
         self.start_date_entry.insert(0, start_date_period)
         self.OK_button_pushed(code, self.start_date_entry.get(), self.end_date_entry.get())
+
+    def center_window_to_display(self, Screen: CT.CTk, width: int, height: int, scale_factor: float = 1.0):
+        """Centers the window to the main display/monitor"""
+        screen_width = Screen.winfo_screenwidth()
+        screen_height = Screen.winfo_screenheight()
+        x = int(((screen_width/2) - (width/2)) * scale_factor)
+        y = int(((screen_height/2) - (height/1.5)) * scale_factor)
+        return f"{width}x{height}+{x}+{y}"
+
+    def wrong_date_popup(self):
+        messagebox.showwarning(title="Błąd", message="Błędna wartość daty.")
