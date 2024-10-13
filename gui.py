@@ -139,15 +139,6 @@ class GUI:
         #Start Tkinter loop
         app_window.mainloop()
 
-    # def round_list_values(self, values:list, dec_places:int) -> list:
-
-    #     rounded_values = []
-
-    #     for value in values:
-    #         rounded_values.append(round(value, dec_places))
-
-    #     return rounded_values
-
     def OK_button_pushed(self, currencies_code, start_date, end_date):
         """_summary_
 
@@ -163,7 +154,6 @@ class GUI:
         self.fig.clear()
         if currencies_code == 'ZŁOTO':
             self.key_date, value_rate = prepare_gold_data(start_date, end_date)
-            # rounded_values_data = self.round_list_values(value_rate, 2)
             gold_plot = self.fig.add_subplot(111)
             gold_plot.plot(self.key_date, value_rate, marker = 'o')
             gold_plot.tick_params(axis='x', rotation=45)
@@ -243,14 +233,4 @@ class GUI:
         return f"{width}x{height}+{x}+{y}"
 
     def wrong_date_popup(self):
-        # msg_box = CT.CTk()
-        # msg_box.resizable(width=0, height=0)
-        # msg_box.geometry(self.center_window_to_display(msg_box, 200, 100, msg_box._get_window_scaling()))
-        # msg_box.title("Błąd")
-        # info_label = CT.CTkLabel(msg_box, text='Błędna wartość daty.')
-        # OK_button = CT.CTkButton(msg_box, text="OK", width=50)
-        # info_label.pack(padx = 10, pady = 10)
-        # OK_button.pack(padx = 10, pady = 10)
-        # msg_box.mainloop()
-
-        msg_box = messagebox.showwarning(title="Błąd", message="Błędna wartość daty.")
+        messagebox.showwarning(title="Błąd", message="Błędna wartość daty.")
