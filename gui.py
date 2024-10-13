@@ -14,106 +14,96 @@ DROP_DOWN_MENU_VALUE = ["USD", "EUR", "CHF", "GBP", "ZŁOTO"]
 TODAY = datetime.today()
 
 class GUI:
-
     def __init__(self) -> None:
         #Open Tkinter window
-        app_window = CT.CTk()
-        app_window.title('Kursy walut')
+        self.app_window = CT.CTk()
+        self.app_window.title('Kursy walut')
 
-        #Create Frames in Tkinter window
-        frame_result = CT.CTkFrame(master=app_window, border_width = 1)
-        frame_graph = CT.CTkFrame(master=app_window, border_width = 1)
-        frame_date_input = CT.CTkFrame(master=app_window, border_width = 1)
-        frame_exchange = CT.CTkFrame(master=app_window, border_width = 1)
+        self._create_frame_date_input()
+        self._create_frame_result()
+        self._create_frame_graph()
+        self._create_frame_exchange()
 
-        #exchange frame
-        exchange_label = CT.CTkLabel(frame_exchange, text = "Przelicz walutę")
-        confirm_button = CT.CTkButton(frame_exchange, text="Przelicz", width=60)
-        currency_quantity_left = CT.CTkEntry(frame_exchange)
-        combo_currencies_left = CT.CTkComboBox(frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
-        currency_quantity_right = CT.CTkEntry(frame_exchange)
-        combo_currencies_right = CT.CTkComboBox(frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
-        exchange_label.grid(row =0, columnspan = 4, sticky = "NEWS")
-        confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
-        currency_quantity_left.grid(row = 1, column = 0, sticky = "NEWS")
-        combo_currencies_left.grid(row = 1, column = 1, sticky = "NEWS")
-        currency_quantity_right.grid(row = 1, column = 2, sticky = "NEWS")
-        combo_currencies_right.grid(row = 1, column = 3, sticky = "NEWS")
+        #Creating grid table
+        self.frame_result.grid(column = 0, row = 1, sticky = "NEWS")
+        self.frame_graph.grid(column = 1, row = 0, rowspan = 3, sticky = "NEWS")
+        self.frame_date_input.grid(column = 0, row = 0, sticky = "NEWS")
+        self.frame_exchange.grid(column = 0, row = 2, stick = "NEWS")
 
-        #Label and Title to frame with rates values(text field)
-        result_label = CT.CTkLabel(frame_result, text='Rezultat')
-        result = CT.CTkTextbox(frame_result, height = 200, width = 370)
+        #first column is const, second column is resizable
+        self.app_window.rowconfigure(0, weight=1)
+        self.app_window.rowconfigure(1, weight=1)
+        self.app_window.rowconfigure(2, weight=1)
+        self.app_window.columnconfigure(0, weight=0)
+        self.app_window.columnconfigure(1, weight=1)
+
+        self._bind_functions()
+
+        self._set_default_values()
+        
+        #Start Tkinter loop
+        self.app_window.mainloop()
+
+    def _create_frame_date_input(self):
+        self.frame_date_input = CT.CTkFrame(master=self.app_window, border_width = 1)
 
         #Labels and Title to Input Form Frame
-        label_period = CT.CTkLabel(frame_date_input, text='PODAJ ZAKRES')
-        self.start_date_entry = CT.CTkEntry(frame_date_input)
-        start_date_label = CT.CTkLabel(frame_date_input, text='Data startu: ')
-        self.end_date_entry = CT.CTkEntry(frame_date_input)
-        end_date_label = CT.CTkLabel(frame_date_input, text='Data zakończenia: ')
-        buttons_choice_1D = CT.CTkButton(frame_date_input, text="1D", 
-                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 1), width=40)
-        buttons_choice_1M = CT.CTkButton(frame_date_input, text="1M", 
-                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 30), width=40)
-        buttons_choice_3M = CT.CTkButton(frame_date_input, text="3M", 
-                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 90), width=40)
-        buttons_choice_6M = CT.CTkButton(frame_date_input, text="6M", 
-                                      command = lambda: self.period_button_pushed(combo_currencies.get(), 180), width=40)
-        #Creating Drop-Down menu with currencies and gold
-        combo_currencies_label = CT.CTkLabel(frame_date_input, text = 'Wybierz walutę: ')
-        combo_currencies = CT.CTkComboBox(frame_date_input, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        label_period = CT.CTkLabel(self.frame_date_input, text='PODAJ ZAKRES')
+        self.start_date_entry = CT.CTkEntry(self.frame_date_input)
+        start_date_label = CT.CTkLabel(self.frame_date_input, text='Data startu: ')
+        self.end_date_entry = CT.CTkEntry(self.frame_date_input)
+        end_date_label = CT.CTkLabel(self.frame_date_input, text='Data zakończenia: ')
 
-        #Create atributes to plot graph
-        graph_label = CT.CTkLabel(frame_graph, text='Wykres wartości w czasie')
-        self.fig = Figure(figsize = (7.0, 8.0), dpi = 100)
-        self.canvas = FigureCanvasTkAgg(self.fig, master = frame_graph)
+        # Create quick buttons for basic periods
+        buttons_choice_1d = CT.CTkButton(self.frame_date_input, text="1D", 
+                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 1), width=40)
+        buttons_choice_1m = CT.CTkButton(self.frame_date_input, text="1M", 
+                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 30), width=40)
+        buttons_choice_3m = CT.CTkButton(self.frame_date_input, text="3M", 
+                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 90), width=40)
+        buttons_choice_6m = CT.CTkButton(self.frame_date_input, text="6M", 
+                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 180), width=40)
+
+        #Creating Drop-Down menu with currencies and gold
+        combo_currencies_label = CT.CTkLabel(self.frame_date_input, text = 'Wybierz walutę: ')
+        self.combo_currencies = CT.CTkComboBox(self.frame_date_input, state = "readonly", values = DROP_DOWN_MENU_VALUE)
 
         #Get information from Input Form Frame
         accept_button = CT.CTkButton(
-            frame_date_input, 
+            self.frame_date_input, 
             text = "OK", 
-            command = lambda: self.OK_button_pushed(combo_currencies.get(), self.start_date_entry.get(), self.end_date_entry.get())
+            command = lambda: self.OK_button_pushed(self.combo_currencies.get(), self.start_date_entry.get(), self.end_date_entry.get())
             )
 
-        #Creating grid table
-        frame_result.grid(column = 0, row = 1, sticky = "NEWS")
-        frame_graph.grid(column = 1, row = 0, rowspan = 3, sticky = "NEWS")
-        frame_date_input.grid(column = 0, row = 0, sticky = "NEWS")
-        frame_exchange.grid(column = 0, row = 2, stick = "NEWS")
-        #first column is const, second column is resizable
-        app_window.rowconfigure(0, weight=1)
-        app_window.rowconfigure(1, weight=1)
-        app_window.rowconfigure(2, weight=1)
-        app_window.columnconfigure(0, weight=0)
-        app_window.columnconfigure(1, weight=1)
-
-        #Settings for result label and text field
-        result.configure(state = 'normal')
-        result.configure(state = 'disabled')
-        result_label.pack(padx = PADING_VALUE, pady = PADING_VALUE)
-        result.pack(padx = PADING_VALUE, pady = (0, PADING_VALUE))
-
-        #Entry dates period to plot graph
         COLSPAN = 4
-        self.start_date_entry.insert(0,'rrrr-mm-dd')
-        self.start_date_entry.bind('<FocusIn>', self.on_entry_click)
-        self.start_date_entry.bind('<FocusOut>', self.on_focusout)
-        self.start_date_entry.bind('<KeyPress>', self.on_key_press)
-        self.start_date_entry.bind('<KeyRelease>', self.on_key_release)
+
+        # Place all elements
         label_period.grid(column = 0, columnspan = COLSPAN, row = 0, padx = PADING_VALUE, pady = PADING_VALUE, sticky="EW")
         start_date_label.grid(column = 0, columnspan = COLSPAN, row = 1, padx = PADING_VALUE)
         self.start_date_entry.grid(column = 0, columnspan = COLSPAN, row = 2, padx = PADING_VALUE)
         end_date_label.grid(column = 0, columnspan = COLSPAN, row = 3, padx = PADING_VALUE)
         self.end_date_entry.grid(column = 0, columnspan = COLSPAN, row = 4, padx = PADING_VALUE)
         combo_currencies_label.grid(column = 0, columnspan = COLSPAN, row = 5, padx = PADING_VALUE)
-        combo_currencies.grid(column = 0, columnspan = COLSPAN, row = 6, padx = PADING_VALUE)
+        self.combo_currencies.grid(column = 0, columnspan = COLSPAN, row = 6, padx = PADING_VALUE)
         accept_button.grid(column = 0, columnspan = COLSPAN, row = 7, pady = PADING_VALUE)
-        buttons_choice_1D.grid(column = 0, row = 8)
-        buttons_choice_1M.grid(column = 1, row = 8)
-        buttons_choice_3M.grid(column = 2, row = 8)
-        buttons_choice_6M.grid(column = 3, row = 8)
+        buttons_choice_1d.grid(column = 0, row = 8)
+        buttons_choice_1m.grid(column = 1, row = 8)
+        buttons_choice_3m.grid(column = 2, row = 8)
+        buttons_choice_6m.grid(column = 3, row = 8)
 
-        combo_currencies.set("USD")
-        self.end_date_entry.insert(0,TODAY.strftime('%Y-%m-%d'))
+    def _create_frame_result(self):
+
+        self.frame_result = CT.CTkFrame(master=self.app_window, border_width = 1)
+
+        #Label and Title to frame with rates values(text field)
+        result_label = CT.CTkLabel(self.frame_result, text='Rezultat')
+        result = CT.CTkTextbox(self.frame_result, height = 200, width = 370)
+
+        #Settings for result label and text field
+        result.configure(state = 'normal')
+        result.configure(state = 'disabled')
+        result_label.pack(padx = PADING_VALUE, pady = PADING_VALUE)
+        result.pack(padx = PADING_VALUE, pady = (0, PADING_VALUE))
 
         #Loop prints rates information 
         basic_codes = ['EUR', 'USD', 'GBP', 'CHF']
@@ -123,21 +113,54 @@ class GUI:
         result.configure(state='normal')
 
         result.insert(tk.INSERT, f'Kurs złota na dzień: {gold_date}\n')
-
         result.insert(tk.INSERT, f'Wartość złota 1g - {gold:0.2f} zł.\n')
-
         result.insert(tk.INSERT, f'Kursy walut na dzień: {currencies_date}\n')
 
         for currency in currencies:
-            result.insert(tk.INSERT, f'Kurs waluty: {currency['currency'].upper()}, wynosi 1{currency['code']} - {currency['mid']:.2f}zł.\n')
+            result.insert(tk.INSERT, f'{currency['currency'].upper()}, wynosi 1{currency['code']} - {currency['mid']:.2f}zł.\n')
         result.configure(state='disabled')
+
+    def _create_frame_graph(self):
+
+        self.frame_graph = CT.CTkFrame(master=self.app_window, border_width = 1)
+
+        #Create atributes to plot graph
+        graph_label = CT.CTkLabel(self.frame_graph, text='Wykres wartości w czasie')
+        self.fig = Figure(figsize = (7.0, 8.0), dpi = 100)
+        self.canvas = FigureCanvasTkAgg(self.fig, master = self.frame_graph)
 
         #Create graph space
         graph_label.pack(padx = PADING_VALUE, pady = PADING_VALUE)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1, padx = PADING_VALUE, pady = PADING_VALUE)
 
-        #Start Tkinter loop
-        app_window.mainloop()
+    def _create_frame_exchange(self):
+
+        self.frame_exchange = CT.CTkFrame(master=self.app_window, border_width = 1)
+
+        #exchange frame
+        exchange_label = CT.CTkLabel(self.frame_exchange, text = "Przelicz walutę")
+        confirm_button = CT.CTkButton(self.frame_exchange, text="Przelicz", width=60)
+        currency_quantity_left = CT.CTkEntry(self.frame_exchange)
+        combo_currencies_left = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        currency_quantity_right = CT.CTkEntry(self.frame_exchange)
+        combo_currencies_right = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        exchange_label.grid(row =0, columnspan = 4, sticky = "NEWS")
+        confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
+        currency_quantity_left.grid(row = 1, column = 0, sticky = "NEWS")
+        combo_currencies_left.grid(row = 1, column = 1, sticky = "NEWS")
+        currency_quantity_right.grid(row = 1, column = 2, sticky = "NEWS")
+        combo_currencies_right.grid(row = 1, column = 3, sticky = "NEWS")
+
+    def _bind_functions(self):
+        self.start_date_entry.bind('<FocusIn>', self.on_entry_click)
+        self.start_date_entry.bind('<FocusOut>', self.on_focusout)
+        self.start_date_entry.bind('<KeyPress>', self.on_key_press)
+        self.start_date_entry.bind('<KeyRelease>', self.on_key_release)
+
+    def _set_default_values(self):
+        self.combo_currencies.set("USD")
+        self.start_date_entry.insert(0,'rrrr-mm-dd')
+        self.end_date_entry.insert(0, TODAY.strftime('%Y-%m-%d'))
 
     def OK_button_pushed(self, currencies_code, start_date, end_date):
         """_summary_
