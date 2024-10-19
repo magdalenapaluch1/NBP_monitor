@@ -2,6 +2,14 @@
 
 from requests import get
 
+BASE_URL = 'https://api.nbp.pl/api/'
+
+def send_request_and_get_response(url):
+    api_url = url
+    response = get(api_url)
+    return response
+
+
 def get_currencies() -> list:
     """API connection to show the details of curriencies for today
 
@@ -9,11 +17,9 @@ def get_currencies() -> list:
         list: information about rates of currencies
     """
 
-    api_url = 'http://api.nbp.pl/api/exchangerates/tables/A/today/'
-    response = get(api_url)
+    response = send_request_and_get_response(BASE_URL + '/exchangerates/tables/A/today/')
     if response.status_code == 404:
-        api_url = 'http://api.nbp.pl/api/exchangerates/tables/A/'
-        response = get(api_url)
+        response = send_request_and_get_response(BASE_URL + '/exchangerates/tables/A/') 
         #TODO handle other errors
     currency_data = response.json()
     return currency_data
@@ -32,8 +38,8 @@ def get_currencies_from_period(code: str, start_date:str, end_date:str):
     """
 
     rates_from_period = {}
-    api_url = f'http://api.nbp.pl/api/exchangerates/rates/A/{code}/{start_date}/{end_date}/?format=json'
-    response = get(api_url)
+    response = send_request_and_get_response(BASE_URL + f'/exchangerates/rates/A/{code}/{start_date}/{end_date}/?format=json')
+
     currencies_period = response.json()
 
     for rate in currencies_period['rates']:
@@ -49,11 +55,9 @@ def get_gold_rate() -> list:
     Returns:
         list: information about rates of gold
     """
-    api_url = 'http://api.nbp.pl/api/cenyzlota/today'
-    response = get(api_url)
+    response = send_request_and_get_response(BASE_URL + '/cenyzlota/today')
     if response.status_code == 404:
-        api_url = 'http://api.nbp.pl/api/cenyzlota/'
-        response = get(api_url)
+        response = send_request_and_get_response(BASE_URL + '/cenyzlota/')
         #TODO handle other errors
     gold_data = response.json()
     return gold_data
@@ -71,8 +75,7 @@ def get_gold_from_period(start_date:str, end_date:str):
     """
 
     gold_rates_from_period = {}
-    api_url = f'http://api.nbp.pl/api/cenyzlota/{start_date}/{end_date}/?format=json'
-    response = get(api_url)
+    response = send_request_and_get_response(BASE_URL + f'/cenyzlota/{start_date}/{end_date}/?format=json')
 
     if response.status_code == 200:
         gold_period = response.json()
@@ -90,7 +93,7 @@ def get_gold_from_period(start_date:str, end_date:str):
 
 '''Rates for today currencies and gold'''
 
-def get_today_exchange_rate(codes):
+def get_today_exchange_rates_by_list(codes):
     """gets current rates of currencies
     """
     currencies_list = []
@@ -103,6 +106,16 @@ def get_today_exchange_rate(codes):
             currencies_list.append({'currency': name_currency['currency'].upper(), 'code': name_currency['code'], 'mid': name_currency['mid']})
 
     return currencies_list, effective_date
+
+def get_today_exchange_rate(code):
+    response = send_request_and_get_response(f'https://api.nbp.pl/api/exchangerates/rates/A/{code}/')
+    json_cur_data = response.json()
+
+    # Json returns one dict
+    # {'table': 'A', 'currency': 'dolar amerykański', 'code': 'USD', 'rates': [{'no': '204/A/NBP/2024', 'effectiveDate': '2024-10-18', 'mid': 3.9718}]}
+    currency_rate = json_cur_data['rates'][0]['mid']
+
+    return currency_rate
 
 def get_today_gold_rate():
     """gets current rates of gold

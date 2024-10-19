@@ -253,8 +253,7 @@ class GUI:
     def calculate_button_pushed(self):
         value = self.currency_to_calc.get()
         currency = self.combo_currency_exchange.get()
-        rate, date = get_today_exchange_rates_by_list(currency)
-        rate = rate[0]['mid']
+        rate = get_today_exchange_rate(currency)
         to_PLN = round((float(value) * rate), 2)
         self.currency_pln.delete(0, tk.END)
         self.currency_pln.insert(0, to_PLN)
