@@ -11,6 +11,7 @@ from mplcursors import cursor
 
 PADING_VALUE = 10 #offset from the axis
 DROP_DOWN_MENU_VALUE = ["USD", "EUR", "CHF", "GBP", "ZŁOTO"]
+DROP_DOWN_EXCHANGE = ["USD", "EUR", "CHF", "GBP"]
 TODAY = datetime.today()
 
 class GUI:
@@ -107,7 +108,7 @@ class GUI:
 
         #Loop prints rates information 
         basic_codes = ['EUR', 'USD', 'GBP', 'CHF']
-        currencies, currencies_date = get_today_exchange_rate(basic_codes)
+        currencies, currencies_date = get_today_exchange_rates_by_list(basic_codes)
         gold, gold_date = get_today_gold_rate()
 
         result.configure(state='normal')
@@ -137,18 +138,20 @@ class GUI:
 
         self.frame_exchange = CT.CTkFrame(master=self.app_window, border_width = 1)
 
-        #exchange frame
+        #exchange frame to PLN
         exchange_label = CT.CTkLabel(self.frame_exchange, text = "Przelicz walutę")
-        confirm_button = CT.CTkButton(self.frame_exchange, text="Przelicz", width=60)
-        currency_quantity_left = CT.CTkEntry(self.frame_exchange)
-        combo_currencies_left = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
-        currency_quantity_right = CT.CTkEntry(self.frame_exchange)
-        combo_currencies_right = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_MENU_VALUE)
+        confirm_button = CT.CTkButton(self.frame_exchange, text="Przelicz", width=60, command=self.calculate_button_pushed)
+        self.currency_to_calc = CT.CTkEntry(self.frame_exchange)
+        self.combo_currency_exchange = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_EXCHANGE)
+        self.combo_currency_exchange.set('USD')
+        self.currency_pln = CT.CTkEntry(self.frame_exchange)
+        combo_currencies_right = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = ['PLN'])
+        combo_currencies_right.set('PLN')
         exchange_label.grid(row =0, columnspan = 4, sticky = "NEWS")
         confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
-        currency_quantity_left.grid(row = 1, column = 0, sticky = "NEWS")
-        combo_currencies_left.grid(row = 1, column = 1, sticky = "NEWS")
-        currency_quantity_right.grid(row = 1, column = 2, sticky = "NEWS")
+        self.currency_to_calc.grid(row = 1, column = 0, sticky = "NEWS")
+        self.combo_currency_exchange.grid(row = 1, column = 1, sticky = "NEWS")
+        self.currency_pln.grid(row = 1, column = 2, sticky = "NEWS")
         combo_currencies_right.grid(row = 1, column = 3, sticky = "NEWS")
 
     def _bind_functions(self):
@@ -246,6 +249,15 @@ class GUI:
         self.start_date_entry.delete(0, tk.END)
         self.start_date_entry.insert(0, start_date_period)
         self.OK_button_pushed(code, self.start_date_entry.get(), self.end_date_entry.get())
+
+    def calculate_button_pushed(self):
+        value = self.currency_to_calc.get()
+        currency = self.combo_currency_exchange.get()
+        rate, date = get_today_exchange_rates_by_list(currency)
+        rate = rate[0]['mid']
+        to_PLN = round((float(value) * rate), 2)
+        self.currency_pln.delete(0, tk.END)
+        self.currency_pln.insert(0, to_PLN)
 
     def center_window_to_display(self, Screen: CT.CTk, width: int, height: int, scale_factor: float = 1.0):
         """Centers the window to the main display/monitor"""
