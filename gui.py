@@ -57,36 +57,31 @@ class GUI:
 
         # Create quick buttons for basic periods
         buttons_choice_1d = CT.CTkButton(self.frame_date_input, text="1D", 
-                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 1), width=40)
+                                      command = lambda: self.period_button_pushed(1), width=40)
         buttons_choice_1m = CT.CTkButton(self.frame_date_input, text="1M", 
-                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 30), width=40)
+                                      command = lambda: self.period_button_pushed(30), width=40)
         buttons_choice_3m = CT.CTkButton(self.frame_date_input, text="3M", 
-                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 90), width=40)
+                                      command = lambda: self.period_button_pushed(90), width=40)
         buttons_choice_6m = CT.CTkButton(self.frame_date_input, text="6M", 
-                                      command = lambda: self.period_button_pushed(self.combo_currencies.get(), 180), width=40)
+                                      command = lambda: self.period_button_pushed(180), width=40)
 
         #Creating Drop-Down menu with currencies and gold
         combo_currencies_label = CT.CTkLabel(self.frame_date_input, text = 'Wybierz walutę: ')
         self.combo_currencies = CT.CTkComboBox(self.frame_date_input, state = "readonly", values = DROP_DOWN_MENU_VALUE)
 
-        #Get information from Input Form Frame
-        accept_button = CT.CTkButton(
-            self.frame_date_input, 
-            text = "OK", 
-            command = lambda: self.OK_button_pushed(self.combo_currencies.get(), self.start_date_entry.get(), self.end_date_entry.get())
-            )
-
-        COLSPAN = 4
+        #Create OK button
+        self.ok_button = CT.CTkButton(self.frame_date_input, text = "OK")
 
         # Place all elements
-        label_period.grid(column = 0, columnspan = COLSPAN, row = 0, padx = PADING_VALUE, pady = PADING_VALUE, sticky="EW")
-        start_date_label.grid(column = 0, columnspan = COLSPAN, row = 1, padx = PADING_VALUE)
-        self.start_date_entry.grid(column = 0, columnspan = COLSPAN, row = 2, padx = PADING_VALUE)
-        end_date_label.grid(column = 0, columnspan = COLSPAN, row = 3, padx = PADING_VALUE)
-        self.end_date_entry.grid(column = 0, columnspan = COLSPAN, row = 4, padx = PADING_VALUE)
-        combo_currencies_label.grid(column = 0, columnspan = COLSPAN, row = 5, padx = PADING_VALUE)
-        self.combo_currencies.grid(column = 0, columnspan = COLSPAN, row = 6, padx = PADING_VALUE)
-        accept_button.grid(column = 0, columnspan = COLSPAN, row = 7, pady = PADING_VALUE)
+        colspan = 4
+        label_period.grid(column = 0, columnspan = colspan, row = 0, padx = PADING_VALUE, pady = PADING_VALUE, sticky="EW")
+        start_date_label.grid(column = 0, columnspan = colspan, row = 1, padx = PADING_VALUE)
+        self.start_date_entry.grid(column = 0, columnspan = colspan, row = 2, padx = PADING_VALUE)
+        end_date_label.grid(column = 0, columnspan = colspan, row = 3, padx = PADING_VALUE)
+        self.end_date_entry.grid(column = 0, columnspan = colspan, row = 4, padx = PADING_VALUE)
+        combo_currencies_label.grid(column = 0, columnspan = colspan, row = 5, padx = PADING_VALUE)
+        self.combo_currencies.grid(column = 0, columnspan = colspan, row = 6, padx = PADING_VALUE)
+        self.ok_button.grid(column = 0, columnspan = colspan, row = 7, pady = PADING_VALUE)
         buttons_choice_1d.grid(column = 0, row = 8)
         buttons_choice_1m.grid(column = 1, row = 8)
         buttons_choice_3m.grid(column = 2, row = 8)
@@ -140,15 +135,15 @@ class GUI:
 
         #exchange frame to PLN
         exchange_label = CT.CTkLabel(self.frame_exchange, text = "Przelicz walutę")
-        confirm_button = CT.CTkButton(self.frame_exchange, text="Przelicz", width=60, command=self.calculate_button_pushed)
+        self.confirm_button = CT.CTkButton(self.frame_exchange, text="Przelicz", width=60)
         self.currency_to_calc = CT.CTkEntry(self.frame_exchange)
         self.combo_currency_exchange = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = DROP_DOWN_EXCHANGE)
         self.combo_currency_exchange.set('USD')
         self.currency_pln = CT.CTkEntry(self.frame_exchange)
-        combo_currencies_right = CT.CTkComboBox(self.frame_exchange, state = "readonly", values = ['PLN'])
-        combo_currencies_right.set('PLN')
+        combo_currencies_right = CT.CTkEntry(self.frame_exchange, placeholder_text = 'PLN')
+        combo_currencies_right.configure(state = "disabled")
         exchange_label.grid(row =0, columnspan = 4, sticky = "NEWS")
-        confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
+        self.confirm_button.grid(row = 2, columnspan = 4, sticky = "NEWS")
         self.currency_to_calc.grid(row = 1, column = 0, sticky = "NEWS")
         self.combo_currency_exchange.grid(row = 1, column = 1, sticky = "NEWS")
         self.currency_pln.grid(row = 1, column = 2, sticky = "NEWS")
@@ -160,48 +155,13 @@ class GUI:
         self.start_date_entry.bind('<KeyPress>', self.on_key_press)
         self.start_date_entry.bind('<KeyRelease>', self.on_key_release)
 
+        self.ok_button.configure(command = self.ok_button_pushed)
+        self.confirm_button.configure(command=self.calculate_button_pushed)
+
     def _set_default_values(self):
         self.combo_currencies.set("USD")
         self.start_date_entry.insert(0,'rrrr-mm-dd')
         self.end_date_entry.insert(0, TODAY.strftime('%Y-%m-%d'))
-
-    def OK_button_pushed(self, currencies_code, start_date, end_date):
-        """_summary_
-
-        Args:
-            code (str): three-letter currency code (ISO 4217 standard) or GOLD
-            start_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
-            end_date (str): date in YYYY-MM-DD format (ISO 8601 standard)
-        """
-        if datetime.strptime(start_date, "%Y-%m-%d") > datetime.strptime(end_date, "%Y-%m-%d"):
-            self.wrong_date_popup()
-            return
-        
-        self.fig.clear()
-        if currencies_code == 'ZŁOTO':
-            self.key_date, value_rate = prepare_gold_data(start_date, end_date)
-            gold_plot = self.fig.add_subplot(111)
-            gold_plot.plot(self.key_date, value_rate, marker = 'o')
-            gold_plot.tick_params(axis='x', rotation=45)
-            gold_plot.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            gold_plot.xaxis.set_major_locator(ticker.AutoLocator())
-            gold_plot.grid(visible=True, linewidth=1)
-            gold_plot.set_ylabel('Kurs za 1g [PLN]')
-            gold_plot.format_coord = self.format_coords
-            cursor(gold_plot, hover=True)
-            self.canvas.draw()
-        else:
-            self.key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
-            currency_plot = self.fig.add_subplot(111)
-            currency_plot.plot(self.key_date, value_rate, marker = 'o')
-            currency_plot.tick_params(axis='x', rotation=45)
-            currency_plot.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-            currency_plot.xaxis.set_major_locator(ticker.AutoLocator())
-            currency_plot.grid(visible=True, linewidth=1)
-            currency_plot.set_ylabel(f'Kurs za 1 {currencies_code} - PLN')
-            currency_plot.format_coord = self.format_coords
-            cursor(currency_plot, hover=True)
-            self.canvas.draw()
 
     def format_coords(self, x, y):
         idx = round(x)
@@ -236,27 +196,54 @@ class GUI:
         if pos in [4, 7]:
             event.widget.insert(pos, '-')
 
+    def ok_button_pushed(self):
+        currencies_code = self.combo_currencies.get()
+        start_date = self.start_date_entry.get()
+        end_date = self.end_date_entry.get()
 
-    def period_button_pushed(self, code, day_period):
-        """_summary_
+        if datetime.strptime(start_date, "%Y-%m-%d") > datetime.strptime(end_date, "%Y-%m-%d"):
+            self.wrong_date_popup()
+            return
+        
+        self.fig.clear()
+        if currencies_code == 'ZŁOTO':
+            self.key_date, value_rate = prepare_gold_data(start_date, end_date)
+            gold_plot = self.fig.add_subplot(111)
+            gold_plot.plot(self.key_date, value_rate, marker = 'o')
+            gold_plot.tick_params(axis='x', rotation=45)
+            gold_plot.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            gold_plot.xaxis.set_major_locator(ticker.AutoLocator())
+            gold_plot.grid(visible=True, linewidth=1)
+            gold_plot.set_ylabel('Kurs za 1g [PLN]')
+            gold_plot.format_coord = self.format_coords
+            cursor(gold_plot, hover=True)
+            self.canvas.draw()
+        else:
+            self.key_date, value_rate = prepare_currencies_data(currencies_code, start_date, end_date)
+            currency_plot = self.fig.add_subplot(111)
+            currency_plot.plot(self.key_date, value_rate, marker = 'o')
+            currency_plot.tick_params(axis='x', rotation=45)
+            currency_plot.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            currency_plot.xaxis.set_major_locator(ticker.AutoLocator())
+            currency_plot.grid(visible=True, linewidth=1)
+            currency_plot.set_ylabel(f'Kurs za 1 {currencies_code} - PLN')
+            currency_plot.format_coord = self.format_coords
+            cursor(currency_plot, hover=True)
+            self.canvas.draw()
 
-        Args:
-            code (str): three-letter currency code (ISO 4217 standard) or GOLD
-            start_date (str): date in YYYY-MM-DD format (ISO 8601 standard), choice from period buttons
-            end_date (str): date in YYYY-MM-DD format (ISO 8601 standard), today
-        """
+    def period_button_pushed(self, day_period):
         start_date_period = datetime.strftime((datetime.today() - timedelta(days = day_period)), '%Y-%m-%d')
         self.start_date_entry.delete(0, tk.END)
         self.start_date_entry.insert(0, start_date_period)
-        self.OK_button_pushed(code, self.start_date_entry.get(), self.end_date_entry.get())
+        self.ok_button_pushed()
 
     def calculate_button_pushed(self):
         value = self.currency_to_calc.get()
         currency = self.combo_currency_exchange.get()
         rate = get_today_exchange_rate(currency)
-        to_PLN = round((float(value) * rate), 2)
+        pln_value = round((float(value) * rate), 2)
         self.currency_pln.delete(0, tk.END)
-        self.currency_pln.insert(0, to_PLN)
+        self.currency_pln.insert(0, pln_value)
 
     def center_window_to_display(self, Screen: CT.CTk, width: int, height: int, scale_factor: float = 1.0):
         """Centers the window to the main display/monitor"""
